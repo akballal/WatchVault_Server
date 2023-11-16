@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,5 +77,11 @@ public class DataService {
     public List<Data> getAllDataByUser(String Authorization) {
         String token = Authorization.substring("Bearer ".length());
         return datarepo.findByUserUsername(jwtService.extractUsername(token));
+    }
+
+    public List<Data> filterData(String Authorization, Date startDate, Date endDate) {
+        String token = Authorization.substring("Bearer ".length());
+        String username = jwtService.extractUsername(token);
+        return datarepo.findByUserUsernameAndWatchedonGreaterThanAndWatchedonLessThan(username,startDate,endDate);
     }
 }

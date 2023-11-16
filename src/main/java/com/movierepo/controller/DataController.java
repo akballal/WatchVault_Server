@@ -54,4 +54,9 @@ public class DataController {
     public List<Data> getAllData(@RequestHeader String Authorization) {
         return dataservice.getAllDataByUser(Authorization);
     }
+
+    @GetMapping("/filterdata")
+    public List<Data> filterData(@RequestHeader String Authorization, @RequestHeader("startDateObject") Date startDate, @RequestHeader("endDateObject") Date endDate) {
+        return dataservice.filterData(Authorization,startDate,endDate);
+    }
 }
