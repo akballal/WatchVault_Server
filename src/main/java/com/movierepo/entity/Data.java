@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @Entity  @Component @Table(name="app_data")
 public class Data {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int dataid;
     private String name;
     private String description;

@@ -31,8 +31,12 @@ public class DataService {
         data.setWatchedon(watchedon);
         data.setRating(rating);
         data.setType(type);
-        byte[] bytes = photo.getBytes();
-        data.setPhoto(bytes);
+
+        if (photo != null && !photo.isEmpty()) {
+            byte[] bytes = photo.getBytes();
+            data.setPhoto(bytes);
+        }
+
         datarepo.save(data);
         return ResponseEntity.ok("Data added successfully!!");
     }

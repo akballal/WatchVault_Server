@@ -30,7 +30,7 @@ public class DataController {
             @RequestParam("watchedon") Timestamp watchedon,
             @RequestParam("rating") float rating,
             @RequestParam("type") String type,
-            @RequestPart("photo") MultipartFile photo,
+            @RequestPart(value = "photo", required = false) MultipartFile photo,
             @RequestHeader String Authorization) throws IOException {
 
         return dataservice.addData(name,description,watchedon,rating,type,photo,Authorization);
