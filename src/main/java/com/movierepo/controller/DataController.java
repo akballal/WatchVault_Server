@@ -7,13 +7,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
 
 @RestController
 @RequestMapping("/data")
@@ -24,8 +24,16 @@ public class DataController {
     private DataService dataservice;
 
     @PostMapping("/adddata")
-    private ResponseEntity<String> addData(@RequestBody Data data, @RequestHeader String Authorization) {
-        return dataservice.addData(data,Authorization);
+    private ResponseEntity<String> addData(
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("watchedon") Timestamp watchedon,
+            @RequestParam("rating") float rating,
+            @RequestParam("type") String type,
+            @RequestPart("photo") MultipartFile photo,
+            @RequestHeader String Authorization) throws IOException {
+
+        return dataservice.addData(name,description,watchedon,rating,type,photo,Authorization);
     }
 
     @GetMapping("/getdatabyid")

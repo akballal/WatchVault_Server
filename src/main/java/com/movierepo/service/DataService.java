@@ -4,28 +4,35 @@ import com.movierepo.config.JwtService;
 import com.movierepo.entity.Data;
 import com.movierepo.entity.User;
 import com.movierepo.repository.DataRepo;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class DataService {
+    @Autowired private DataRepo datarepo;
+    @Autowired private JwtService jwtService;
+    @Autowired private User user;
+    @Autowired private  Data data;
 
-    private final DataRepo datarepo;
-    private final JwtService jwtService;
-    private final User user;
-
-
-    public ResponseEntity<String> addData(Data data,String Authorization) {
+    public ResponseEntity<String> addData(String name, String description, Timestamp watchedon, float rating, String type, MultipartFile photo, String Authorization) throws IOException {
         String token = Authorization.substring("Bearer ".length());
         user.setUsername(jwtService.extractUsername(token));
         data.setUser(user);
+        data.setName(name);
+        data.setDescription(description);
+        data.setWatchedon(watchedon);
+        data.setRating(rating);
+        data.setType(type);
+        byte[] bytes = photo.getBytes();
+        data.setPhoto(bytes);
         datarepo.save(data);
         return ResponseEntity.ok("Data added successfully!!");
     }

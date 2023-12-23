@@ -13,8 +13,6 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "app_user")
 @Component
 public class User implements UserDetails {
@@ -32,6 +30,10 @@ public class User implements UserDetails {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override
