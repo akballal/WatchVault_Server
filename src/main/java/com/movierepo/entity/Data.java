@@ -1,13 +1,8 @@
 package com.movierepo.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.springframework.stereotype.Component;
-
 import java.sql.Timestamp;
 
 @Entity  @Component @Table(name="app_data")
