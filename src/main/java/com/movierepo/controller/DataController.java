@@ -31,9 +31,10 @@ public class DataController {
             @RequestParam("rating") float rating,
             @RequestParam("type") String type,
             @RequestPart(value = "photo", required = false) MultipartFile photo,
+            @RequestParam(value = "trailer", required = false) String trailer,
             @RequestHeader String Authorization) throws IOException {
 
-        return dataservice.addData(name,description,watchedon,rating,type,photo,Authorization);
+        return dataservice.addData(name,description,watchedon,rating,type,photo,trailer,Authorization);
     }
 
     @GetMapping("/getdatabyid")
@@ -43,8 +44,16 @@ public class DataController {
     }
 
     @PutMapping("/updatedata")
-    public ResponseEntity<String> updateEntity(@RequestBody Data updatedEntity) {
-        Optional<Data> updatedOptionalEntity = dataservice.findByDataidAndUpdate(updatedEntity);
+    public ResponseEntity<String> updateEntity(@RequestParam("dataid") int dataid,
+                                               @RequestParam("name") String name,
+                                               @RequestParam("description") String description,
+                                               @RequestParam("watchedon") Timestamp watchedon,
+                                               @RequestParam("rating") float rating,
+                                               @RequestParam("type") String type,
+                                               @RequestPart(value = "photo", required = false) MultipartFile photo,
+                                               @RequestParam(value = "trailer", required = false) String trailer,
+                                               @RequestParam(value = "username") String user) throws IOException {
+        Optional<Data> updatedOptionalEntity = dataservice.findByDataidAndUpdate(dataid,name,description,watchedon,rating,type,photo,trailer,user);
 
         if (updatedOptionalEntity.isPresent()) {
             return ResponseEntity.ok("Data updated successfully!");

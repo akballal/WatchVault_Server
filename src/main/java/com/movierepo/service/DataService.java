@@ -7,6 +7,8 @@ import com.movierepo.repository.DataRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,7 +23,7 @@ public class DataService {
     @Autowired private JwtService jwtService;
 
 
-    public ResponseEntity<String> addData(String name, String description, Timestamp watchedon, float rating, String type, MultipartFile photo, String Authorization) throws IOException {
+    public ResponseEntity<String> addData(String name, String description, Timestamp watchedon, float rating, String type, MultipartFile photo, String trailer, String Authorization) throws IOException {
         String token = Authorization.substring("Bearer ".length());
 
         // Create a new Data instance for each request
@@ -38,6 +40,12 @@ public class DataService {
         data.setWatchedon(watchedon);
         data.setRating(rating);
         data.setType(type);
+
+
+        if(trailer != null && !trailer.isEmpty())
+        {
+            data.setTrailer(trailer);
+        }
 
         if (photo != null && !photo.isEmpty()) {
             byte[] bytes = photo.getBytes();
@@ -58,19 +66,43 @@ public class DataService {
         }
     }
 
-    public Optional<Data> findByDataidAndUpdate(Data updatedEntity) {
-        int dataid = updatedEntity.getDataid();
+    public Optional<Data> findByDataidAndUpdate(int dataid,
+                                                String name,
+                                                String description,
+                                                Timestamp watchedon,
+                                                float rating,
+                                                String type,
+                                                MultipartFile photo,
+                                                String trailer,
+                                                String user) throws IOException {
+
         Optional<Data> optionalEntity = datarepo.findByDataid(dataid);
 
         if (optionalEntity.isPresent()) {
             Data existingEntity = optionalEntity.get();
 
             // Update the fields of the existing entity with values from the updated entity
-            existingEntity.setName(updatedEntity.getName());
-            existingEntity.setDescription(updatedEntity.getDescription());
-            existingEntity.setWatchedon(updatedEntity.getWatchedon());
-            existingEntity.setRating(updatedEntity.getRating());
-            existingEntity.setType(updatedEntity.getType());
+            existingEntity.setName(name);
+            existingEntity.setDescription(description);
+            existingEntity.setWatchedon(watchedon);
+            existingEntity.setRating(rating);
+            existingEntity.setType(type);
+
+            if(trailer != null && !trailer.isEmpty())
+            {
+                existingEntity.setTrailer(trailer);
+            }
+            else {
+                if(existingEntity.getTrailer() != null && !existingEntity.getTrailer().isEmpty())
+                {
+                    existingEntity.setTrailer(null);
+                }
+            }
+            if (photo != null && !photo.isEmpty()) {
+                byte[] bytes = photo.getBytes();
+                existingEntity.setPhoto(bytes);
+            }
+
 
 
             // Save the updated entity

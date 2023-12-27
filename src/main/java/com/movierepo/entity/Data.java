@@ -89,6 +89,15 @@ public class Data {
     @Column(name = "photo", columnDefinition = "bytea")
     private byte[] photo;
 
+    private String trailer;
+
+    public String getTrailer() {
+        return trailer;
+    }
+
+    public void setTrailer(String trailer) {
+        this.trailer = (trailer != null && !trailer.trim().isEmpty() && !"null".equalsIgnoreCase(trailer.trim())) ? trailer : null;
+    }
 
     @ManyToOne
     @JoinColumn(name = "username") // This is the foreign key column name in the app_data table
