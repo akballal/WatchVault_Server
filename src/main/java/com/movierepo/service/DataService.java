@@ -19,13 +19,20 @@ import java.util.Optional;
 public class DataService {
     @Autowired private DataRepo datarepo;
     @Autowired private JwtService jwtService;
-    @Autowired private User user;
-    @Autowired private  Data data;
+
 
     public ResponseEntity<String> addData(String name, String description, Timestamp watchedon, float rating, String type, MultipartFile photo, String Authorization) throws IOException {
         String token = Authorization.substring("Bearer ".length());
+
+        // Create a new Data instance for each request
+        Data data = new Data();
+
+        // Set user information
+        User user = new User();
         user.setUsername(jwtService.extractUsername(token));
         data.setUser(user);
+
+        // Set other data fields
         data.setName(name);
         data.setDescription(description);
         data.setWatchedon(watchedon);
@@ -36,10 +43,11 @@ public class DataService {
             byte[] bytes = photo.getBytes();
             data.setPhoto(bytes);
         }
-
         datarepo.save(data);
+
         return ResponseEntity.ok("Data added successfully!!");
     }
+
 
     public ResponseEntity<Optional<Data>> getDataById(int dataid) {
         Optional<Data> ExistingData = datarepo.findByDataid(dataid);
