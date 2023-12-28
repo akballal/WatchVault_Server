@@ -102,6 +102,12 @@ public class DataService {
                 byte[] bytes = photo.getBytes();
                 existingEntity.setPhoto(bytes);
             }
+            else {
+                if(existingEntity.getPhoto() != null)
+                {
+                    existingEntity.setPhoto(null);
+                }
+            }
 
 
 
