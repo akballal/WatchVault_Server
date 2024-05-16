@@ -38,7 +38,7 @@ public class DataController {
     }
 
     @GetMapping("/getdatabyid")
-    private ResponseEntity<Optional<Data>> getDataById(@RequestHeader("id") int dataid) {
+    private ResponseEntity<Data> getDataById(@RequestHeader("id") int dataid) {
         logger.info(String.valueOf(dataid));
         return dataservice.getDataById(dataid);
     }
@@ -53,18 +53,25 @@ public class DataController {
                                                @RequestPart(value = "photo", required = false) MultipartFile photo,
                                                @RequestParam(value = "trailer", required = false) String trailer,
                                                @RequestParam(value = "username") String user) throws IOException {
-        Optional<Data> updatedOptionalEntity = dataservice.findByDataidAndUpdate(dataid,name,description,watchedon,rating,type,photo,trailer,user);
+        ResponseEntity<Data> updatedEntityResponse = dataservice.findByDataidAndUpdate(dataid, name, description, watchedon, rating, type, photo, trailer, user);
 
-        if (updatedOptionalEntity.isPresent()) {
+        if (updatedEntityResponse.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.ok("Data updated successfully!");
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
+
     @DeleteMapping("/deletedata")
     public ResponseEntity<String> deleteEntity(@RequestHeader("id") int dataid) {
-        return dataservice.deleteData(dataid);
+        ResponseEntity<Data> deleteEntityResponse = dataservice.deleteData(dataid);
+
+        if (deleteEntityResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.ok("Data deleted successfully!");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/getalldata")

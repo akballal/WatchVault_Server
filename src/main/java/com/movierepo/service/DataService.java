@@ -5,10 +5,12 @@ import com.movierepo.entity.Data;
 import com.movierepo.entity.User;
 import com.movierepo.repository.DataRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,7 +24,7 @@ public class DataService {
     @Autowired private DataRepo datarepo;
     @Autowired private JwtService jwtService;
 
-
+    @Transactional
     public ResponseEntity<String> addData(String name, String description, Timestamp watchedon, float rating, String type, MultipartFile photo, String trailer, String Authorization) throws IOException {
         String token = Authorization.substring("Bearer ".length());
 
@@ -56,25 +58,28 @@ public class DataService {
         return ResponseEntity.ok("Data added successfully!!");
     }
 
-
-    public ResponseEntity<Optional<Data>> getDataById(int dataid) {
-        Optional<Data> ExistingData = datarepo.findByDataid(dataid);
-        if (ExistingData.isPresent()) {
-            return ResponseEntity.ok(ExistingData);
+    @Cacheable(cacheNames = "datacache", key = "#dataid")
+    public ResponseEntity<Data> getDataById(int dataid) {
+        System.out.println("Getting data from data repository !!");
+        Optional<Data> existingData = datarepo.findByDataid(dataid);
+        if (existingData.isPresent()) {
+            return ResponseEntity.ok(existingData.get());
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
-    public Optional<Data> findByDataidAndUpdate(int dataid,
-                                                String name,
-                                                String description,
-                                                Timestamp watchedon,
-                                                float rating,
-                                                String type,
-                                                MultipartFile photo,
-                                                String trailer,
-                                                String user) throws IOException {
+
+    @CachePut(cacheNames = "datacache", key = "#dataid")
+    public ResponseEntity<Data> findByDataidAndUpdate(int dataid,
+                                                      String name,
+                                                      String description,
+                                                      Timestamp watchedon,
+                                                      float rating,
+                                                      String type,
+                                                      MultipartFile photo,
+                                                      String trailer,
+                                                      String user) throws IOException {
 
         Optional<Data> optionalEntity = datarepo.findByDataid(dataid);
 
@@ -88,48 +93,45 @@ public class DataService {
             existingEntity.setRating(rating);
             existingEntity.setType(type);
 
-            if(trailer != null && !trailer.isEmpty())
-            {
+            if (trailer != null && !trailer.isEmpty()) {
                 existingEntity.setTrailer(trailer);
-            }
-            else {
-                if(existingEntity.getTrailer() != null && !existingEntity.getTrailer().isEmpty())
-                {
+            } else {
+                if (existingEntity.getTrailer() != null && !existingEntity.getTrailer().isEmpty()) {
                     existingEntity.setTrailer(null);
                 }
             }
             if (photo != null && !photo.isEmpty()) {
                 byte[] bytes = photo.getBytes();
                 existingEntity.setPhoto(bytes);
-            }
-            else {
-                if(existingEntity.getPhoto() != null)
-                {
+            } else {
+                if (existingEntity.getPhoto() != null) {
                     existingEntity.setPhoto(null);
                 }
             }
 
-
-
             // Save the updated entity
-            datarepo.save(existingEntity);
+            Data savedEntity = datarepo.save(existingEntity);
 
-            return Optional.of(existingEntity);
+            return ResponseEntity.ok(savedEntity);
         } else {
             // Handle the case where the entity with the given ID is not found
-            return Optional.empty();
+            return ResponseEntity.notFound().build();
         }
     }
 
-    public ResponseEntity<String> deleteData(int dataid) {
+
+    @CacheEvict(cacheNames = "datacache", key = "#dataid")
+    public ResponseEntity<Data> deleteData(int dataid) {
         Optional<Data> optionalEntity = datarepo.findByDataid(dataid);
         if (optionalEntity.isPresent()) {
+            Data deletedData = optionalEntity.get();
             datarepo.deleteById(dataid);
-            return ResponseEntity.ok("Data deleted successfully!");
+            return ResponseEntity.ok(deletedData);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     public List<Data> getAllDataByUser(String Authorization) {
         String token = Authorization.substring("Bearer ".length());
