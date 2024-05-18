@@ -26,7 +26,14 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
-    private static final String[] WHITE_LIST_URL = {"/user/**"};
+    private static final String[] WHITE_LIST_URL = {"/user/**",
+            "/movierepo-api-docs/**",
+            "/movierepo-swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/webjars/**"};
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception
     {
