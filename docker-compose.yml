@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   app:
+    image: watchvault-server:latest
     build: .
     ports:
       - "8080:8080"
@@ -13,7 +14,7 @@ services:
       - postgres
 
   postgres:
-    image: postgres:13
+    image: postgres-for-watchvault:13
     environment:
       POSTGRES_DB: movierepo
       POSTGRES_USER: postgres

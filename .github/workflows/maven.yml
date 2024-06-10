@@ -1,33 +1,4 @@
-#name: Github-Actions-Build
-#
-#on:
-#  push:
-#    branches: [ "main" ]
-#  pull_request:
-#    branches: [ "main" ]
-#
-#jobs:
-#  build:
-#
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v4
-#      - name: Set up JDK 17
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: '17'
-#          distribution: 'temurin'
-#          cache: maven
-#      - name: Build with Maven
-#        run: |
-#          mvn clean install -DskipTests
-#          jar_file_path=$(find target -name "*.jar" -exec echo {} \;)
-#          echo "Jar file path: $jar_file_path"
-
-
-
-name: Build and Push Docker Image
+name: Build Docker Image with Docker Compose
 
 on:
   push:
@@ -36,22 +7,34 @@ on:
     branches: [main]
 
 jobs:
-  build-and-push:
+  build-only:
 
     runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:stable
+        options: --privileged
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-      - name: Build and push Docker image
-        run: |
-          docker buildx build --platform linux/amd64,linux/arm64 -t akballal/Movie-Repo-Server-From-Github:${{ github.sha }} .
-          docker push akballal/Movie-Repo-Server-From-Github:${{ github.sha }}
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
 
-      - name: Display updated image name
-        run:
-          echo "Updated image name: akballal/Movie-Repo-Server-From-Github:${{ github.sha }}"
+      - name: Build Docker image
+        run: docker-compose build
+
+      - name: Log in to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker image to Docker Hub
+        run: docker-compose push
