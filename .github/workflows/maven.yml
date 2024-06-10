@@ -1,26 +1,57 @@
-name: Github-Actions-Build
+#name: Github-Actions-Build
+#
+#on:
+#  push:
+#    branches: [ "main" ]
+#  pull_request:
+#    branches: [ "main" ]
+#
+#jobs:
+#  build:
+#
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#          distribution: 'temurin'
+#          cache: maven
+#      - name: Build with Maven
+#        run: |
+#          mvn clean install -DskipTests
+#          jar_file_path=$(find target -name "*.jar" -exec echo {} \;)
+#          echo "Jar file path: $jar_file_path"
+
+
+
+name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
 
 jobs:
-  build:
+  build-and-push:
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
-      - name: Build with Maven
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and push Docker image
         run: |
-          mvn clean install -DskipTests
-          jar_file_path=$(find target -name "*.jar" -exec echo {} \;)
-          echo "Jar file path: $jar_file_path"
+          docker buildx build --platform linux/amd64,linux/arm64 -t akballal/Movie-Repo-Server-From-Github:${{ github.sha }} .
+          docker push akballal/Movie-Repo-Server-From-Github:${{ github.sha }}
+
+      - name: Display updated image name
+        run:
+          echo "Updated image name: akballal/Movie-Repo-Server-From-Github:${{ github.sha }}"
