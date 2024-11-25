@@ -13,7 +13,7 @@ To run this project, you need:
 * Java 17 (JDK 17 or later)
 * Maven (for dependency management and build)
 * PostgreSQL (for the database)
-* Ensure the frontend client is running and accessible. See the client setup instructions here: [WatchVault Client](https://github.com/akballal/WatchVault_Server/blob/main/README.md)
+* Ensure the frontend client is running and accessible. See the client setup instructions here: [WatchVault Client](https://github.com/akballal/WatchVault_Client/blob/main/README.md)
 
 # Getting Started
 1. Clone the Repository
