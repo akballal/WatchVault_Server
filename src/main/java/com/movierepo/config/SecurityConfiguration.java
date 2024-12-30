@@ -1,6 +1,7 @@
 package com.movierepo.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,6 +35,10 @@ public class SecurityConfiguration {
             "/swagger-resources/**",
             "/swagger-ui/**",
             "/webjars/**"};
+
+    @Value(value = "${FRONTEND_URL}")
+    private String frontendURL;
+
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception
     {
@@ -58,9 +63,9 @@ public class SecurityConfiguration {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-
+        System.out.println("frontendURL: " + frontendURL);
         // Instead of using "*" for allowedOrigins, list the specific origins or use allowedOriginPatterns
-        config.addAllowedOrigin("http://localhost:5173"); // Replace with your frontend origin
+        config.addAllowedOrigin(frontendURL); // Replace with your frontend origin
 
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
